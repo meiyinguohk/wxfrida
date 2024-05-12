@@ -103,7 +103,7 @@ def on_message(message, data):
 
 
 rdev = frida.get_usb_device()
-session = rdev.attach("WeChat")  # 如果存在两个一样的进程名可以采用rdev.attach(pid)的方式
+session = rdev.attach("微信")  # 如果存在两个一样的进程名可以采用rdev.attach(pid)的方式
 '''
 
 '''
@@ -122,7 +122,7 @@ script = session.create_script(
             var hook = eval('ObjC.classes.' + className + '["' + funcName + '"]');
             Interceptor.attach(hook.implementation, {
              onEnter: function(args) {
-                
+
               },
               onLeave: function(retval) {
                 retval = 1;
@@ -132,7 +132,7 @@ script = session.create_script(
         {
             console.log("[!] Exception: " + err.message);
         }
-        
+
         try
         {
             var className = "iConsole";
@@ -144,22 +144,22 @@ script = session.create_script(
                 console.log("[*] " + urlStr);
               },
               onLeave: function(retval) {
-                
+
               }
             });
         }catch(err)
         {
             console.log("[!] Exception: " + err.message);
         }
-        
+
         try
         {
             var className = "ProtobufEvent";
-            var funcName = "- Pack:Host:";
+            var funcName = "- Pack:Host:sequenceId:";
             var hook = eval('ObjC.classes.' + className + '["' + funcName + '"]');
             Interceptor.attach(hook.implementation, {
              onEnter: function(args) {
-              console.log("[*] ProtobufEvent Pack in");
+              console.log("[*] ProtobufEvent Pack:Host:sequenceId: in");
                 this.packedBuffer = args[2];
               },
               onLeave: function(retval) {
@@ -171,7 +171,7 @@ script = session.create_script(
                     var array = Memory.readByteArray(ptrbodybyte, bodylen);
                     send("bodybyte",array);
                 }
-                console.log("[*] ProtobufEvent Pack out " + bodylen);
+                console.log("[*] ProtobufEvent Pack:Host:sequenceId: out " + bodylen);
               }
             });
         }catch(err)
@@ -180,11 +180,11 @@ script = session.create_script(
         }
 
         var className = "ProtobufEvent";
-            var funcName = "- UnPack:headExtFlags:";
+            var funcName = "- UnPack:headExtFlags:sequenceId:";
             var hook = eval('ObjC.classes.' + className + '["' + funcName + '"]');
             Interceptor.attach(hook.implementation, {
               onEnter: function(args) {
-              console.log("[*] ProtobufEvent UnPack in");
+              console.log("[*] ProtobufEvent UnPack:headExtFlags:sequenceId: in");
                 this.packedBuffer = args[2];
                 this.decryptBuffer = args[3];
                 var ptrbodybyte = Memory.readPointer(this.packedBuffer);
@@ -200,7 +200,7 @@ script = session.create_script(
                 var ptrbodybyte = Memory.readPointer(this.decryptBuffer);
                 var ptrbodylen = this.decryptBuffer.add(0x10);
                 var bodylen = Memory.readUInt(ptrbodylen);
-               console.log("[*] ProtobufEvent UnPack out " + bodylen);
+               console.log("[*] ProtobufEvent UnPack:headExtFlags:sequenceId: out " + bodylen);
 
               }
             });
@@ -266,7 +266,7 @@ script = session.create_script(
         console.log("Objective-C Runtime is not available!");
     }
 
-    var p_mmcrypto_AesGcmEncryptWithCompress = p_WeChat.add(0x6439F4C);
+    var p_mmcrypto_AesGcmEncryptWithCompress = p_WeChat.add(0x0E0C9204);
     console.log("[*] AesGcmEncryptWithCompress: " + p_mmcrypto_AesGcmEncryptWithCompress);
 
     var p_mmcrypto_AesGcmDecryptWithUncompress = p_WeChat.add(0x6439978);
